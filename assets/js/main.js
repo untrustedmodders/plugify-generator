@@ -190,16 +190,24 @@ function loadManifest(jsonURL) {
 			});
 	
 			hljs.highlightAll();
+			$('#main').show();
+			$('#footer').show();
         },
         error: function (jqxhr, textStatus, error) {
             console.error('Failed to load the file:', textStatus, error);
+			$('#submit-form').addClass('was-validated');
+			$('#form').show();
+			$('#footer').show();
         }
     });
 }
 
-function addRawParam(url) {
-    if (url.includes('github.com')) {
-        return url.includes('?raw=true') ? url : url + '?raw=true';
+function convertToRawUrl(url) {
+    if (url.includes('://github.com')) {
+		var rawUrl = url
+			.replace('://github.com', '://raw.githubusercontent.com')
+			.replace('/blob/', '/refs/heads/')
+		return rawUrl;
     }
     return url;
 }
@@ -210,12 +218,11 @@ function generateBody() {
     const file = urlParams.get('file');
 	
 	$('#spinner').hide();
-	$('#footer').show();
     if (file) {
-		$('#main').show();
-		loadManifest(addRawParam(file));
+		loadManifest(convertToRawUrl(file));
 	} else {
 		$('#form').show();
+		$('#footer').show();
 	}
 }
 
