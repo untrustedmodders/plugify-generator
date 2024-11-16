@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>PlgGen - Plugify Documentation Generator</title>
+      <!-- Meta -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="Plugify Documentation Generator">
+      <meta name="author" content="untrustedmodders">
+      <link rel="icon" type="image/png" href="assets/images/favicon-96x96.png" sizes="96x96" />
+      <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+      <link rel="shortcut icon" href="assets/images/favicon.ico" />
+      <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png" />
+      <link rel="manifest" href="assets/images/site.webmanifest" />
+      <!-- Google Font -->
+      <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet">
+      <!-- FontAwesome JS-->
+      <script defer src="assets/fontawesome/js/all.min.js"></script>
+      <!-- Plugins CSS -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/lightfair.min.css">
+      <link rel="stylesheet" href="assets/plugins/simplelightbox/simple-lightbox.min.css">
+      <!-- Theme CSS -->  
+      <link id="theme-style" rel="stylesheet" href="assets/css/theme.css">
+   </head>
+   <body class="docs-page">
+      <div id="spinner" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
+         <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+         </div>
+      </div>
+      <main>
+         <header class="header fixed-top">
+            <div class="branding docs-branding">
+               <div class="container-fluid position-relative py-2">
+                  <div class="docs-logo-wrapper">
+                     <button id="docs-sidebar-toggler" class="docs-sidebar-toggler docs-sidebar-visible me-2 d-xl-none" type="button"></button>
+                     <div class="site-logo"><a class="navbar-brand" href="index.html"><img class="logo-icon me-2" src="assets/images/plug-logo.svg" alt="logo"><span class="logo-text">Plg<span class="text-alt">Gen</span></span></a></div>
+                  </div>
+                  <!--//docs-logo-wrapper-->
+                  <div class="docs-top-utilities d-flex justify-content-end align-items-center">
+                     <div class="top-search-box d-none d-lg-flex">
+                        <form id="search" class="search-form" style="display: none;">
+                           <input type="text" placeholder="Search the docs..." name="search" class="form-control search-input">
+                           <button type="submit" class="btn search-btn" value="Search"><i class="fas fa-search"></i></button>
+                        </form>
+                     </div>
+                     <ul class="social-list list-inline mx-md-3 mx-lg-5 mb-0 d-none d-lg-flex">
+                        <li class="list-inline-item"><a href="https://github.com/untrustedmodders/"><i class="fa-brands fa-github fa-fw"></i></a></li>
+                        <li class="list-inline-item"><a href="https://discord.gg/rX9TMmpang"><i class="fa-brands fa-discord fa-fw"></i></a></li>
+                     </ul>
+                     <!--//social-list-->
+                     <a href="https://untrustedmodders.github.io/" class="btn btn-primary d-none d-lg-flex">Documentation</a>
+                  </div>
+                  <!--//docs-top-utilities-->
+               </div>
+               <!--//container-->
+            </div>
+            <!--//branding-->
+         </header>
+         <!--//header-->
+         <div id="form" style="display: none;">
+            <div class="page-header theme-bg-dark py-5 text-center position-relative">
+               <div class="theme-bg-shapes-right"></div>
+               <div class="theme-bg-shapes-left"></div>
+               <div class="container">
+                  <h1 class="page-heading single-col-max mx-auto">Manifest Doc Generator</h1>
+               </div>
+            </div>
+            <div class="form-signin">
+               <form id="submit-form" novalidate>
+                  <h1 class="h3 mb-3 fw-normal">Enter details ...</h1>
+                  <div class="form-floating">
+                     <input type="text" pattern="https?://.+" class="form-control" id="input" name="file" placeholder="..." required>
+                     <label for="input">Manifest link</label>
+                     <div class="valid-feedback">Valid.</div>
+                     <div class="invalid-feedback">Please provide a valid URL.</div>
+                  </div>
+                  </br>
+                  <button class="w-100 btn btn-lg btn-primary" type="submit">Generate</button>
+               </form>
+            </div>
+			<section class="cta-section text-center py-5 theme-bg-dark position-relative">
+				<div class="theme-bg-shapes-right"></div>
+				<div class="theme-bg-shapes-left"></div>
+				<div class="container">
+				   <h3 class="mb-2 text-white mb-3">Customize Your Software Project Like A Pro</h3>
+				   <div class="section-intro text-white mb-3 single-col-max mx-auto">Want to make your software project unique by making it personalized for your users? Plugify is our premium solution to make your project development easier and much functional. It is fully equipped with everything you may need to build, adapt, and customize your product with ease using different languages simultaniosly.</div>
+				   <div class="pt-3 text-center">
+					  <a class="btn btn-light" href="https://github.com/untrustedmodders/plugify">Get Plugify<i class="fa fa-circle-right"></i></a></li>
+				   </div>
+				</div>
+			</section>
+         </div>
+         <div id="main" class="docs-wrapper" style="display: none;">
+            <div id="docs-sidebar" class="docs-sidebar">
+               <div class="top-search-box d-lg-none p-3">
+                  <form class="search-form">
+                     <input type="text" placeholder="Search the docs..." name="search" class="form-control search-input">
+                     <button type="submit" class="btn search-btn" value="Search"><i class="fas fa-search"></i></button>
+                  </form>
+               </div>
+               <nav id="docs-nav" class="docs-nav navbar">
+                  <ul id="nav-list" class="section-items list-unstyled nav flex-column pb-3"></ul>
+               </nav>
+               <!--//docs-nav-->
+            </div>
+            <!--//docs-sidebar-->
+            <div class="docs-content">
+               <div id="docs-container" class="container">
+               </div>
+            </div>
+         </div>
+         <!--//docs-wrapper-->
+         <footer id="footer" class="footer" style="display: none;">
+            <div class="footer-bottom text-center py-5">
+               <ul class="social-list list-unstyled pb-4 mb-0">
+                  <li class="list-inline-item"><a href="https://github.com/untrustedmodders/"><i class="fa-brands fa-github fa-fw"></i></a></li>
+                  <li class="list-inline-item"><a href="https://discord.gg/rX9TMmpang"><i class="fa-brands fa-discord fa-fw"></i></a></li>
+               </ul>
+               <!--//social-list-->
+               <!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
+               <small class="copyright">
+                  Designed with <span class="sr-only">love</span>
+                  <svg class="svg-inline--fa fa-heart" style="color: #fb866a;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="heart" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                     <path fill="currentColor" d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"></path>
+                  </svg>
+                  <!-- <i class="fas fa-heart" style="color: #fb866a;"></i> Font Awesome fontawesome.com --> by <a class="theme-link" href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for &copy; untrustedmodders 2023–<script>document.write(new Date().getFullYear())</script>
+               </small>
+            </div>
+         </footer>
+      </main>
+      <!-- Javascript -->          
+      <script src="assets/plugins/popper.min.js"></script>
+      <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>  
+      <!-- Page Specific JS -->
+      <script src="assets/plugins/smoothscroll.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+      <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>-->
+      <script src="assets/js/highlight-custom.js"></script> 
+      <script src="assets/plugins/simplelightbox/simple-lightbox.min.js"></script>      
+      <script src="assets/plugins/gumshoe/gumshoe.polyfills.min.js"></script> 
+      <script src="assets/js/docs.js"></script> 
+      <script src="assets/js/jquery-3.7.1.min.js"></script>
+      <script src="assets/js/main.js"></script>
+   </body>
+</html>
