@@ -19,7 +19,6 @@
       <script defer src="assets/fontawesome/js/all.min.js"></script>
       <!-- Plugins CSS -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/lightfair.min.css">
-      <link rel="stylesheet" href="assets/plugins/simplelightbox/simple-lightbox.min.css">
       <!-- <link rel="stylesheet" href="assets/plugins/simplelightbox/simple-lightbox.min.css"> -->  
       <!-- Theme CSS -->  
       <link id="theme-style" rel="stylesheet" href="assets/css/theme.css">
@@ -41,9 +40,10 @@
                   <!--//docs-logo-wrapper-->
                   <div class="docs-top-utilities d-flex justify-content-end align-items-center">
                      <div class="top-search-box d-none d-lg-flex">
-                        <form id="search" class="search-form" style="display: none;">
-                           <input type="text" placeholder="Search the docs..." name="search" class="form-control search-input">
-                           <button type="submit" class="btn search-btn" value="Search"><i class="fas fa-search"></i></button>
+                        <form id="search-form" class="search-form" style="display: none;">
+                           <input id="search-input" type="text" placeholder="Search the docs..." name="search" class="form-control search-input" list="search-list">
+						   <datalist id="search-list"></datalist>
+                           <button id="search-clear" type="submit" class="btn search-btn" value="Clear"><i class="fas fa-xmark"></i></button>
                         </form>
                      </div>
                      <ul class="social-list list-inline mx-md-3 mx-lg-5 mb-0 d-none d-lg-flex">
@@ -72,7 +72,7 @@
                <form id="submit-form" novalidate>
                   <h1 class="h3 mb-3 fw-normal">Enter details ...</h1>
                   <div class="form-floating">
-                     <input type="text" pattern="https?://.+" class="form-control" id="input" name="file" placeholder="..." required>
+                     <input type="text" pattern="https?://.+" class="form-control" name="file" placeholder="..." required>
                      <label for="input">Manifest link</label>
                      <div class="valid-feedback">Valid.</div>
                      <div class="invalid-feedback">Please provide a valid URL to manifest.</div>
@@ -95,12 +95,6 @@
          </div>
          <div id="main" class="docs-wrapper" style="display: none;">
             <div id="docs-sidebar" class="docs-sidebar">
-               <div class="top-search-box d-lg-none p-3">
-                  <form class="search-form">
-                     <input type="text" placeholder="Search the docs..." name="search" class="form-control search-input">
-                     <button type="submit" class="btn search-btn" value="Search"><i class="fas fa-search"></i></button>
-                  </form>
-               </div>
                <nav id="docs-nav" class="docs-nav navbar">
                   <ul id="nav-list" class="section-items list-unstyled nav flex-column pb-3"></ul>
                </nav>
@@ -139,7 +133,6 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
       <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>-->
       <script src="assets/js/highlight-custom.js"></script> 
-      <script src="assets/plugins/simplelightbox/simple-lightbox.min.js"></script>      
       <!-- <script src="assets/plugins/simplelightbox/simple-lightbox.min.js"></script>   -->   
       <script src="assets/plugins/gumshoe/gumshoe.polyfills.min.js"></script> 
       <script src="assets/js/docs.js"></script> 
