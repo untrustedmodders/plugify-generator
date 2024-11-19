@@ -53,21 +53,29 @@ function createSection(item) {
 	$.each(item.paramTypes, function(index, item) {
 		const element = $('<li>');
 		const paramCode = formatType(item);
-		const paramType = $('<strong>').addClass('me-1 text-green')
+		const paramType = $('<strong>')
+			.addClass('me-1 text-green')
 			.text(paramCode);
+		const paramDesc = $('<p>')
+			.css('text-indent', '20px')
+			.text(item.description);
 		if (item.type == 'function' && item.prototype) {
 			const paramName = $('<strong>');
-			const paramLink = $('<a>').addClass('me-1 text-blue').attr(
-					'href', `#item-${item.prototype.name}`)
-				.text(item.description);
+			const paramLink = $('<a>')
+				.addClass('me-1 text-blue')
+				.attr('href', `#item-${item.prototype.name}`)
+				.text(item.name);
 			paramName.append(paramLink);
 			paramType.append(paramName);
 		} else {
-			const paramName = $('<strong>').addClass('me-1 text-blue')
-				.text(item.description);
+			const paramName = $('<strong>')
+				.addClass('me-1 text-blue')
+				.text(item.name);
 			paramType.append(paramName);
 		}
-		element.append(paramType);
+		element
+			.append(paramType)
+			.append(paramDesc);
 		parameterTypes.append(element);
 		parameterString += (`${paramCode}${item.name}, `);
 	});
@@ -77,15 +85,21 @@ function createSection(item) {
 	}
 
 	const returnCode = formatType(item.retType);
-	const returnType = $('<strong>').addClass('me-1 text-green').text(
-		returnCode);
-	const returnName = $('<strong>').addClass('me-1 text-blue').text(item
-		.retType.name);
-	returnType.append(returnName);
+	const returnType = $('<strong>')
+		.addClass('me-1 text-green')
+		.text(returnCode);
+	const returnName = $('<strong>')
+		.addClass('me-1 text-blue')
+		.text(item.retType.name);
+	const returnDesc = $('<p>')
+		.css('text-indent', '20px')
+		.text(item.retType.description);
+	returnType.append(returnName)
 
 	const functionCode = $('<pre>').append(
-		$('<code>').addClass('language-go').text(
-			`${returnCode}${item.name}(${parameterString})`)
+		$('<code>')
+		.addClass('language-go')
+		.text(`${returnCode}${item.name}(${parameterString})`)
 	);
 
 	return $('<section>')
@@ -97,7 +111,8 @@ function createSection(item) {
 		.append($('<h5>').text('Parameters:'))
 		.append(parameterTypes)
 		.append($('<h5>').text('Return:'))
-		.append(returnType);
+		.append(returnType)
+		.append(returnDesc);
 }
 
 function createPrototype(map, item) {
