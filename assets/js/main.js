@@ -246,6 +246,7 @@ function loadManifest(jsonURL) {
 			$('#search-form').show();
 			$('#main').show();
 			$('#footer').show();
+			
 			const target = $(`${window.location.hash}`);
 			if (target.length) {
 				target[0].scrollIntoView();
