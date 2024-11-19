@@ -124,6 +124,9 @@ function addSearchEntry(item) {
 			.attr('href',
 				`#item-${item.name}`
 			)
+			.attr('id',
+				`nav-${item.name}`
+			)
 			.text(item.name)
 		);
 	$('#nav-list').append(newItem);
@@ -243,6 +246,10 @@ function loadManifest(jsonURL) {
 			$('#search-form').show();
 			$('#main').show();
 			$('#footer').show();
+			const target = $(`${window.location.hash}`);
+			if (target.length) {
+				target[0].scrollIntoView();
+			}
 		},
 		error: function(jqxhr, textStatus, error) {
 			console.error('Failed to load the file:', textStatus, error);
@@ -278,27 +285,34 @@ function generateBody() {
 }
 
 $(function() {
-	$('#search-form').on('submit', function(event) {
-		event.preventDefault();
-		this['search'].value = '';
+	$('#search-clear').on('click', function() {
+		$('#search-input').val('');
 		$('#search-clear').hide();
 	});
-	
-	$('#search-form').on('keydown', function (event) {
-        if (event.key === 'Enter' || event.keyCode === 13) {
-			var search = this['search'].value;
-			location.href = `#item-${search}`;
-        }
-    });
-	
+
 	$('#search-input').on('input', function() {
-        const value = $(this).val();
-        if (value.trim() === '') {
-            $('#search-clear').hide();
-        } else {
-            $('#search-clear').show();
-        }
-    });
+		const value = $(this).val();
+		if (value.trim() === '') {
+			$('#search-clear').hide();
+		} else {
+			$('#search-clear').show();
+		}
+	});
+
+	$('#search-form').on('keydown', function(event) {
+		if (event.key === 'Enter' || event.keyCode === 13) {
+			event.preventDefault();
+			var search = this['search'].value;
+			const target = $(`#nav-${search}`);
+			if (target.length) {
+				target[0].click();
+			}
+		}
+	});
+
+	$('#search-form').on('submit', function(event) {
+		event.preventDefault();
+	});
 
 	$('#submit-form').on('submit', function(event) {
 		if (!this.checkValidity()) {
