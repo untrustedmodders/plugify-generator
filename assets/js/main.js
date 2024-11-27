@@ -118,13 +118,12 @@ function createSection(item) {
 function createPrototype(map, item) {
 	$.each(item.paramTypes, function(index, item) {
 		if (item.type == 'function' && item.name && item.prototype) {
-			map.set(item.name, item.prototype);
+			map.set(item.prototype.name, item.prototype);
 			createPrototype(map, item.prototype);
 		}
 	});
-	if (item.retType.type == 'function' && item.retType.name && item.retType
-		.prototype) {
-		map.set(item.retType.name, item.retType.prototype);
+	if (item.retType.type == 'function' && item.retType.name && item.retType.prototype) {
+		map.set(item.retType.prototype.name, item.retType.prototype);
 		createPrototype(map, item.retType.prototype);
 	}
 }
@@ -248,6 +247,8 @@ function loadManifest(jsonURL) {
 
 					createPrototype(map, item);
 				});
+				
+				console.log(map);
 
 				for (const [_, item] of map) {
 					addSearchEntry(item);
