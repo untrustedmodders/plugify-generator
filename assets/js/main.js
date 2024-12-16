@@ -21,6 +21,16 @@ function safelyParseJSON(json) {
 	return parsed
 }
 
+function formatType(item) {
+	var type = item.type;
+	if (item.ref && item.ref === true) {
+		type += '& ';
+	} else {
+		type += ' ';
+	}
+	return type;
+}
+
 function createRow(option, description) {
 	return $('<tr>')
 		.append(
@@ -36,17 +46,34 @@ function createRow(option, description) {
 		.append($('<td>').text(description));
 }
 
-function formatType(item) {
-	var type = item.type;
-	if (item.ref && item.ref === true) {
-		type += '& ';
-	} else {
-		type += ' ';
-	}
-	return type;
+function createSection(title, items) {
+	const entries = $('<tbody>')
+	$.each(items, function(index, item) {
+		entries.append(createRow(item.name, item.description))
+	});
+
+	const heading = $('<h5>')
+		.text(`${title}:`);
+	const titleHeading = $('<h5>')
+		.text(`${title} Documentation:`);
+
+	const table = $('<table>')
+		.addClass('table table-bordered')
+		.append(
+			entries
+		);
+
+	const tableWrapper = $('<div>')
+		.addClass('table-responsive my-4')
+		.append(table);
+
+	return $('<section>')
+		.append('<br>')
+		.append(heading, tableWrapper)
+		.append(titleHeading);
 }
 
-function createSection(item) {
+function createFuncSection(item) {
 	var parameterString = '';
 
 	const parameterTypes = $('<ul>');
@@ -64,6 +91,14 @@ function createSection(item) {
 			const paramLink = $('<a>')
 				.addClass('me-1 text-blue')
 				.attr('href', `#item-${item.prototype.name}`)
+				.text(item.name);
+			paramName.append(paramLink);
+			paramType.append(paramName);
+		}  else if (item.enum) {
+			const paramName = $('<strong>');
+			const paramLink = $('<a>')
+				.addClass('me-1 text-blue')
+				.attr('href', `#item-${item.enum.name}`)
 				.text(item.name);
 			paramName.append(paramLink);
 			paramType.append(paramName);
@@ -115,17 +150,51 @@ function createSection(item) {
 		.append(returnDesc);
 }
 
-function createPrototype(map, item) {
-	$.each(item.paramTypes, function(index, item) {
-		if (item.type == 'function' && item.name && item.prototype) {
-			map.set(item.prototype.name, item.prototype);
-			createPrototype(map, item.prototype);
-		}
+function createEnumSection(item) {
+	const newEntries = $('<tbody>')
+	$.each(item.values, function(index, item) {
+		newEntries.append(createRow(item.name, item.description))
 	});
-	if (item.retType.type == 'function' && item.retType.name && item.retType.prototype) {
-		map.set(item.retType.prototype.name, item.retType.prototype);
-		createPrototype(map, item.retType.prototype);
+
+	const table = $('<table>')
+		.addClass('table table-bordered')
+		.append(
+			newEntries
+		);
+
+	const tableWrapper = $('<div>')
+		.addClass('table-responsive my-4')
+		.append(table);
+
+	return $('<section>')
+		.addClass('docs-section')
+		.attr('id', `item-${item.name}`)
+		.append($('<h2>').addClass('section-heading').text(item.name))
+		.append($('<p>').text(item.description))
+		.append(tableWrapper);
+}
+
+function processItem(item, delgs, enums) {
+	if (!item.name || item.name.length === 0)
+		return;
+	
+	if (item.prototype) {
+		if (!delgs.has(item.prototype.name)) {
+			delgs.set(item.prototype.name, item.prototype);
+		}
+		processMethod(item.prototype, delgs, enums);
+	} else if (item.enum) {
+		if (!enums.has(item.enum.name) && item.enum.values) {
+			enums.set(item.enum.name, item.enum);
+		}
 	}
+}
+
+function processMethod(item, delgs, enums) {
+	$.each(item.paramTypes, function(index, item) {
+		processItem(item, delgs, enums);
+	});
+	processItem(item.retType, delgs, enums);
 }
 
 function addSearchEntry(item) {
@@ -170,6 +239,9 @@ function loadManifest(jsonURL) {
 			var first = true;
 
 			$.each(groupedData, function(group, items) {
+				if (items.length == 0)
+					return;
+				
 				const newSection = $('<li>')
 					.addClass(
 						'nav-item section-title mt-3')
@@ -192,16 +264,7 @@ function loadManifest(jsonURL) {
 					);
 
 				$('#nav-list').append(newSection);
-
-				const newFunctions = $('<tbody>')
-				$.each(items, function(index, item) {
-					newFunctions.append(createRow(item.name, item.description))
-				});
-
-				const heading = $('<h5>')
-					.text('Functions:');
-				const funcHeading = $('<h5>')
-					.text('Function Documentation:');
+				
 				const docsHeading = $('<h1>')
 					.addClass('docs-heading')
 					.text(group);
@@ -216,16 +279,6 @@ function loadManifest(jsonURL) {
 					first = false;
 				}
 
-				const table = $('<table>')
-					.addClass('table table-bordered')
-					.append(
-						newFunctions
-					);
-
-				const tableWrapper = $('<div>')
-					.addClass('table-responsive my-4')
-					.append(table);
-
 				const newContainer = $('<article>')
 					.addClass('docs-article')
 					.attr('id', `section-${group}`)
@@ -235,26 +288,40 @@ function loadManifest(jsonURL) {
 						.append(
 							docsHeading
 						)
-					)
-					.append(heading, tableWrapper)
-					.append(funcHeading);
-
-				const map = new Map();
-
+					);
+					
+				const delgs = new Map();
+				const enums = new Map();
+				
 				$.each(items, function(index, item) {
-					addSearchEntry(item);
-					newContainer.append(createSection(item));
-
-					createPrototype(map, item);
+					processMethod(item, delgs, enums);
 				});
 				
-				console.log(map);
-
-				for (const [_, item] of map) {
+				var funcSection = createSection("Functions", items);
+				$.each(items, function(index, item) {
 					addSearchEntry(item);
-					newContainer.append(createSection(item));
+					funcSection.append(createFuncSection(item));
+				});
+				newContainer.append(funcSection);
+				
+				if (delgs.size > 0) {
+					var delgsSection = createSection("Delegates", Array.from(delgs.values()));
+					for (const [_, item] of delgs) {
+						addSearchEntry(item);
+						delgsSection.append(createFuncSection(item));
+					}
+					newContainer.append(delgsSection);
 				}
 
+				if (enums.size > 0) {
+					var enumsSection = createSection("Enumerators", Array.from(enums.values()));
+					for (const [_, item] of enums) {
+						addSearchEntry(item);
+						enumsSection.append(createEnumSection(item));
+					}
+					newContainer.append(enumsSection);
+				}
+				
 				$('#docs-container').append(newContainer);
 			});
 
