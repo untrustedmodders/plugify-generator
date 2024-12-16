@@ -211,7 +211,7 @@ function processItem(item, delgs, enums) {
 		}
 		processMethod(item.prototype, delgs, enums, true);
 	} else if (item.enum) {
-		if (!enums.has(item.enum.name)) {
+		if (!enums.has(item.enum.name) && item.enum.values) {
 			enums.set(item.enum.name, item.enum);
 		}
 	}
