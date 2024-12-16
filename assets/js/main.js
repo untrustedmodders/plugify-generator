@@ -23,10 +23,21 @@ function safelyParseJSON(json) {
 
 function formatType(item) {
 	var type = item.type;
+	if (item.prototype) {
+		if (type.includes('[]')) {
+			type = `${item.prototype.name}[]`;
+		} else {
+			type = item.prototype.name;
+		}
+	} else if (item.enum) {
+		if (type.includes('[]')) {
+			type = `${item.enum.name}[]`;
+		} else {
+			type = item.enum.name;
+		}
+	}
 	if (item.ref && item.ref === true) {
-		type += '& ';
-	} else {
-		type += ' ';
+		type += '&';
 	}
 	return type;
 }
@@ -73,69 +84,88 @@ function createSection(title, items) {
 		.append(titleHeading);
 }
 
+function createParam(item, code, pre, post) {
+	const param = $('<strong>');
+	if (item.prototype) {
+		const link = $('<a>')
+			.addClass('me-1 text-green')
+			.text(code);
+		param.append(link);
+		const href = `#item-${item.prototype.name}`;
+		link.attr('href', href)
+		if (item.name && item.name.length > 0) {
+			const name = $('<strong>')
+				.addClass('me-1 text-blue')
+				.text(item.name);
+			param.append(name);
+		}		
+		pre.html = `<strong><a class="me-1 text-green" href="${href}">`
+		post.html = '</a></strong>';
+	} else if (item.enum) {
+		const link = $('<a>')
+			.addClass('me-1 text-green')
+			.text(code);
+		param.append(link);
+		const href = `#item-${item.enum.name}`;
+		link.attr('href', href);
+		if (item.name && item.name.length > 0) {
+			const name = $('<strong>')
+				.addClass('me-1 text-blue')
+				.text(item.name);
+			param.append(name);
+		}
+		pre.html = `<strong><a class="me-1 text-green" href="${href}">`
+		post.html = '</a></strong>';
+	} else {
+		param.addClass('me-1 text-green')
+			.text(code);
+		const name = $('<strong>')
+			.addClass('me-1 text-blue')
+			.text(item.name);
+		param.append(name);
+		pre.html = '<strong class="me-1 text-green">';
+		post.html = '</strong>';
+	}
+	return param;
+}
+
 function createFuncSection(item) {
 	var parameterString = '';
+	var parameterParts = [];
 
 	const parameterTypes = $('<ul>');
 	$.each(item.paramTypes, function(index, item) {
+		let pre = { html: '' };
+		let post = { html: '' };
 		const element = $('<li>');
 		const paramCode = formatType(item);
-		const paramType = $('<strong>')
-			.addClass('me-1 text-green')
-			.text(paramCode);
+		const paramType = createParam(item, `${paramCode} `, pre, post);
 		const paramDesc = $('<p>')
 			.css('text-indent', '20px')
 			.text(item.description);
-		if (item.type == 'function' && item.prototype) {
-			const paramName = $('<strong>');
-			const paramLink = $('<a>')
-				.addClass('me-1 text-blue')
-				.attr('href', `#item-${item.prototype.name}`)
-				.text(item.name);
-			paramName.append(paramLink);
-			paramType.append(paramName);
-		}  else if (item.enum) {
-			const paramName = $('<strong>');
-			const paramLink = $('<a>')
-				.addClass('me-1 text-blue')
-				.attr('href', `#item-${item.enum.name}`)
-				.text(item.name);
-			paramName.append(paramLink);
-			paramType.append(paramName);
-		} else {
-			const paramName = $('<strong>')
-				.addClass('me-1 text-blue')
-				.text(item.name);
-			paramType.append(paramName);
-		}
 		element
 			.append(paramType)
 			.append(paramDesc);
 		parameterTypes.append(element);
-		parameterString += (`${paramCode}${item.name}, `);
+		parameterParts.push(`${pre.html}${paramCode}${post.html} <strong class="me-1 text-blue">${item.name}, </strong>`);
 	});
 
-	if (parameterString && parameterString.length > 0) {
-		parameterString = parameterString.slice(0, -2);
+	if (parameterParts.length > 0) {
+		parameterString = parameterParts.join("")
+		parameterString = parameterString.slice(0, -11);
+		parameterString += '</strong>';
 	}
 
+	let pre = { html: '' };
+	let post = { html: '' };
 	const returnCode = formatType(item.retType);
-	const returnType = $('<strong>')
-		.addClass('me-1 text-green')
-		.text(returnCode);
-	const returnName = $('<strong>')
-		.addClass('me-1 text-blue')
-		.text(item.retType.name);
+	const returnType = createParam(item.retType, `${returnCode} `, pre, post);
 	const returnDesc = $('<p>')
 		.css('text-indent', '20px')
 		.text(item.retType.description);
-	returnType.append(returnName)
 
-	const functionCode = $('<pre>').append(
-		$('<code>')
-		.addClass('language-go')
-		.text(`${returnCode}${item.name}(${parameterString})`)
-	);
+	const functionCode = $('<code>')
+		.html(`${pre.html}${returnCode}${post.html}<strong class="me-1 text-blue"> ${item.name}(</strong>${parameterString}<strong class="me-1 text-blue">)</strong>`);
 
 	return $('<section>')
 		.addClass('docs-section')
@@ -175,16 +205,13 @@ function createEnumSection(item) {
 }
 
 function processItem(item, delgs, enums) {
-	if (!item.name || item.name.length === 0)
-		return;
-	
 	if (item.prototype) {
 		if (!delgs.has(item.prototype.name)) {
 			delgs.set(item.prototype.name, item.prototype);
 		}
-		processMethod(item.prototype, delgs, enums);
+		processMethod(item.prototype, delgs, enums, true);
 	} else if (item.enum) {
-		if (!enums.has(item.enum.name) && item.enum.values) {
+		if (!enums.has(item.enum.name)) {
 			enums.set(item.enum.name, item.enum);
 		}
 	}
@@ -239,7 +266,7 @@ function loadManifest(jsonURL) {
 			var first = true;
 
 			$.each(groupedData, function(group, items) {
-				if (items.length == 0)
+				if (items.length === 0)
 					return;
 				
 				const newSection = $('<li>')
@@ -325,7 +352,7 @@ function loadManifest(jsonURL) {
 				$('#docs-container').append(newContainer);
 			});
 
-			hljs.highlightAll();
+			//hljs.highlightAll();
 			$('#search-form').show();
 			$('#main').show();
 			$('#footer').show();
