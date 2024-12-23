@@ -396,21 +396,25 @@ function generateBody() {
 }
 
 $(function() {
-	$('#search-clear').on('click', function() {
-		$('#search-input').val('');
-		$('#search-clear').hide();
+	const searchInput = $('#search-input');
+	const searchClear = $('#search-clear');
+	const searchForm = $('#search-form');
+
+	searchClear.on('click', function() {
+		searchInput.val('');
+		searchClear.hide();
 	});
 
-	$('#search-input').on('input', function() {
+	searchInput.on('input', function() {
 		const value = $(this).val();
 		if (value.trim() === '') {
-			$('#search-clear').hide();
+			searchClear.hide();
 		} else {
-			$('#search-clear').show();
+			searchClear.show();
 		}
 	});
 
-	$('#search-form').on('keydown', function(event) {
+	searchForm.on('keydown', function(event) {
 		if (event.key === 'Enter' || event.keyCode === 13) {
 			event.preventDefault();
 			var search = this['search'].value;
@@ -421,11 +425,11 @@ $(function() {
 		}
 	});
 
-	$('#search-form').on('submit', function(event) {
+	searchForm.on('submit', function(event) {
 		event.preventDefault();
 	});
 
-	$('#submit-form').on('submit', function(event) {
+	searchForm.on('submit', function(event) {
 		if (!this.checkValidity()) {
 			event.preventDefault();
 			event.stopPropagation();
