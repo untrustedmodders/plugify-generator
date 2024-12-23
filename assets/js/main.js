@@ -224,8 +224,12 @@ function processMethod(item, delgs, enums) {
 	processItem(item.retType, delgs, enums);
 }
 
+const searchInput = $('#search-input'); // Поле ввода
+const searchList = $('#search-list');  // Выпадающий список для поиска
+
+// Добавление элемента в список поиска
 function addSearchEntry(item) {
-	const newItem = $('<li>')
+	const sidebarItem = $('<li>')
 		.addClass('nav-item')
 		.append(
 			$('<a>')
@@ -239,10 +243,30 @@ function addSearchEntry(item) {
 			)
 			.text(item.name)
 		);
-	$('#nav-list').append(newItem);
+	$('#nav-list').append(sidebarItem);
 
-	const newData = $('<option>').val(item.name);
-	$('#search-list').append(newData);
+	const searchItem = $('<li>')
+		.addClass('dropdown-item')
+		.text(item.name)
+		.on('mousedown', function (e) {
+			e.preventDefault();
+			searchInput.val(item.name);
+			searchList.hide();
+			emitEnter(searchItem);
+		});
+
+	searchList.append(searchItem);
+}
+
+function emitEnter(inputElement) {
+	const enterEvent = new KeyboardEvent('keydown', {
+		key: 'Enter',
+		code: 'Enter',
+		keyCode: 13,
+		which: 13,
+		bubbles: true
+	});
+	inputElement[0].dispatchEvent(enterEvent);
 }
 
 function loadManifest(jsonURL) {
@@ -443,6 +467,38 @@ $(function() {
 		}).done(function() {
 			generateBody();
 		});
+	});
+
+	searchInput.on('input', function () {
+		const query = $(this).val().toLowerCase();
+		if (query) {
+			searchList.children('li').each(function () {
+				const itemText = $(this).text().toLowerCase();
+				$(this).toggle(itemText.includes(query));
+			});
+			searchList.show();
+		} else {
+
+			searchList.children('li').show();
+			searchList.show();
+		}
+	});
+
+	searchInput.on('focus', function () {
+		if (searchList.children('li').length > 0) {
+			searchList.children('li').show();
+			searchList.show();
+		}
+	});
+
+	$(document).on('mousedown', function (e) {
+		if (!$(e.target).closest('#search-input').length && !$(e.target).closest('#search-list').length) {
+			searchList.hide();
+		}
+	});
+
+	$(window).on('blur', function () {
+		searchList.hide();
 	});
 
 	generateBody();
