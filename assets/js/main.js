@@ -458,7 +458,6 @@ $(function() {
 			event.preventDefault();
 			event.stopPropagation();
 		}
-		$(this).addClass('was-validated');
 
 		var link = this['file'].value;
 		$.ajax({
