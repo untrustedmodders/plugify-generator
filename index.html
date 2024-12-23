@@ -19,8 +19,12 @@
       <script defer src="assets/fontawesome/js/all.min.js"></script>  
       <!-- Theme CSS -->  
       <link id="theme-style" rel="stylesheet" href="assets/css/theme.css">
+      <script>
+         const savedTheme = localStorage.getItem('theme') || 'light';
+         document.documentElement.setAttribute('data-bs-theme', savedTheme);
+     </script>
    </head>
-   <body class="docs-page">
+   <body class="docs-page theme-initial">
       <div id="spinner" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
          <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
@@ -49,6 +53,11 @@
                      </ul>
                      <!--//social-list-->
                      <a href="https://untrustedmodders.github.io/" class="btn btn-primary d-none d-lg-flex">Documentation</a>
+                     <ul class="social-list list-inline mx-md-3 mx-lg-3 mb-0 d-none d-lg-flex">
+                        <li id="themeToggle" class="list-inline-item">
+                           <i class="fa-solid fa-moon"></i> <!-- Иконка для темной темы -->
+                        </li>
+                    </ul>
                   </div>
                   <!--//docs-top-utilities-->
                </div>
@@ -122,14 +131,36 @@
             </div>
          </footer>
       </main>
-      <!-- Javascript -->          
+      <!-- Javascript -->
       <script src="assets/plugins/popper.min.js"></script>
-      <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>  
+      <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
       <!-- Page Specific JS -->
       <script src="assets/plugins/smoothscroll.min.js"></script>
-      <script src="assets/plugins/gumshoe/gumshoe.polyfills.min.js"></script> 
-      <script src="assets/js/docs.js"></script> 
+      <script src="assets/plugins/gumshoe/gumshoe.polyfills.min.js"></script>
+      <script src="assets/js/docs.js"></script>
       <script src="assets/js/jquery-3.7.1.min.js"></script>
       <script src="assets/js/main.js"></script>
+      <script>
+         const themeToggle = document.getElementById('themeToggle');
+         const body = document.body;
+         const updateIcon = (theme) => {
+               if (theme === 'light') {
+                  themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+               } else {
+                  themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+               }
+         };
+         updateIcon(document.documentElement.getAttribute('data-bs-theme'));
+         window.addEventListener('load', () => {
+               body.classList.remove('theme-initial');
+         });
+         themeToggle.addEventListener('click', () => {
+               const currentTheme = body.getAttribute('data-bs-theme');
+               const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+               body.setAttribute('data-bs-theme', newTheme);
+               updateIcon(newTheme);
+               localStorage.setItem('theme', newTheme);
+         });
+     </script>
    </body>
 </html>
