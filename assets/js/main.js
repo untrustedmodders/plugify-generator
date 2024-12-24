@@ -224,10 +224,11 @@ function processMethod(item, delgs, enums) {
 	processItem(item.retType, delgs, enums);
 }
 
-const searchInput = $('#search-input'); // Поле ввода
-const searchList = $('#search-list');  // Выпадающий список для поиска
+const searchInput = $('#search-input');
+const searchList = $('#search-list'); 
+const searchClear = $('#search-clear');
+const searchForm = $('#search-form');
 
-// Добавление элемента в список поиска
 function addSearchEntry(item) {
 	const sidebarItem = $('<li>')
 		.addClass('nav-item')
@@ -251,6 +252,8 @@ function addSearchEntry(item) {
 		.on('mousedown', function (e) {
 			e.preventDefault();
 			searchInput.val(item.name);
+			searchInput.trigger('input');
+			searchClear.show();
 			searchList.hide();
 			emitEnter(searchItem);
 		});
@@ -420,10 +423,6 @@ function generateBody() {
 }
 
 $(function() {
-	const searchInput = $('#search-input');
-	const searchClear = $('#search-clear');
-	const searchForm = $('#search-form');
-
 	searchClear.on('click', function() {
 		searchInput.val('');
 		searchClear.hide();
@@ -477,7 +476,6 @@ $(function() {
 			});
 			searchList.show();
 		} else {
-
 			searchList.children('li').show();
 			searchList.show();
 		}
